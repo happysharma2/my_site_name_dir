@@ -1,0 +1,19 @@
+--- .htaccess	2019-09-02 11:19:06.000000000 +0530
++++ htaccess_new	2019-09-02 11:26:17.000000000 +0530
+@@ -69,6 +69,16 @@
+ <IfModule mod_rewrite.c>
+   RewriteEngine on
+ 
++  # Force redirect to https.
++  #RewriteCond %{HTTPS} off
++  #RewriteCond %{HTTP:X-Forwarded-Proto} !https
++  #RewriteCond %{HTTP_HOST} ^(.*)\.hindawi.com
++  #RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
++
++  RewriteCond %{HTTP:X-Forwarded-Proto} =http
++  RewriteCond %{HTTP_HOST} ^(.*)\.w2o.hindawi.com
++  RewriteRule .* https://%{HTTP:Host}%{REQUEST_URI} [L,R=permanent]
++
+   # Set "protossl" to "s" if we were accessed via https://.  This is used later
+   # if you enable "www." stripping or enforcement, in order to ensure that
+   # you don't bounce between http and https.
