@@ -22,6 +22,7 @@
         "drupal-composer/drupal-scaffold": "^2.5",
         "drupal/console": "^1.0.2",
         "drupal/core": "^8.7.0",
+        "drupal/image_canvas_editor_api": "1.x-dev",
         "drupal/inline_entity_form": "1.0-rc2",
         "drupal/s3fs": "^3.0@alpha",
         "drupal/xmlsitemap": "1.0.0-alpha3",
