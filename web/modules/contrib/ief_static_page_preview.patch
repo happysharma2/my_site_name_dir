@@ -1,0 +1,49 @@
+diff --git a/inline_entity_form/src/Plugin/Field/FieldWidget/InlineEntityFormComplex.php b/inline_entity_form/src/Plugin/Field/FieldWidget/InlineEntityFormComplex.php
+index 6d00451..b0c84bd 100644
+--- a/inline_entity_form/src/Plugin/Field/FieldWidget/InlineEntityFormComplex.php
++++ b/inline_entity_form/src/Plugin/Field/FieldWidget/InlineEntityFormComplex.php
+@@ -17,6 +17,8 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+ use Drupal\Core\Render\Element;
+ use Drupal\inline_entity_form\TranslationHelper;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
++use Drupal\Core\Link;
++use Drupal\Core\Url;
+ 
+ /**
+  * Complex inline widget.
+@@ -389,6 +391,27 @@ class InlineEntityFormComplex extends InlineEntityFormBase implements ContainerF
+         // and the access check for deleting happens inside the controller
+         // removeForm() method.
+         if (empty($entity_id) || $settings['allow_existing'] || $entity->access('delete')) {
++          // Add Preview functionality for journal static pages.
++          $moduleHandler = \Drupal::service('module_handler');
++          if ($moduleHandler->moduleExists('ezcontent_preview')) {
++            $url = Url::fromRoute('ezcontent.preview.view', [
++              'node' => $entity_id,
++              'preview_type' => 'preview_content',
++            ]);
++            $link_options = [
++              'attributes' => [
++                'class' => [
++                  'button',
++                  'ief-preview',
++                ],
++                'target' => [
++                  '_blank',
++                ],
++              ],
++            ];
++            $url->setOptions($link_options);
++            $preview = Link::fromTextAndUrl('Preview', $url);
++          }
+           $row['actions']['ief_entity_remove'] = [
+             '#type' => 'submit',
+             '#value' => $this->t('Remove'),
+@@ -401,6 +424,7 @@ class InlineEntityFormComplex extends InlineEntityFormBase implements ContainerF
+             '#submit' => ['inline_entity_form_open_row_form'],
+             '#ief_row_delta' => $key,
+             '#ief_row_form' => 'remove',
++            '#suffix' => isset($preview) ? $preview->toString() : '',
+             '#access' => !$element['#translating'],
+           ];
+         }

@@ -1,0 +1,54 @@
+diff --git a/s3fs/src/Form/SettingsForm.php b/s3fs/src/Form/SettingsForm.php
+index 210b131..554bc2c 100644
+--- a/s3fs/src/Form/SettingsForm.php
++++ b/s3fs/src/Form/SettingsForm.php
+@@ -81,6 +81,20 @@ class SettingsForm extends ConfigFormBase {
+       ),
+     ];
+ 
++    $form['credentials']['use_ecs_credentials'] = [
++      '#type' => 'checkbox',
++      '#title' => $this->t('Use ECS Credentials'),
++      '#default_value' => $config->get('use_ecs_credentials'),
++      '#description' => $this->t(
++        'If your Drupal site is Running drupal with fargate/ecs credentials.'
++      ),
++      '#states' => [
++        'visible' => [
++          ':input[id=edit-use-instance-profile]' => ['checked' => TRUE],
++        ],
++      ],
++    ];
++
+     $form['credentials']['access_key'] = [
+       '#type' => 'textfield',
+       '#title' => $this->t('Amazon Web Services Access Key'),
+@@ -442,6 +456,7 @@ class SettingsForm extends ConfigFormBase {
+     $values = $form_state->getValues();
+     $this->config('s3fs.settings')
+       ->set('use_instance_profile', $values['use_instance_profile'])
++      ->set('use_ecs_credentials', $values['use_ecs_credentials'])
+       ->set('credentials_file', $values['credentials_file'])
+       ->set('bucket', $values['bucket'])
+       ->set('region', $values['region'])
+diff --git a/s3fs/src/S3fsService.php b/s3fs/src/S3fsService.php
+index 06903f0..b1ec7d3 100644
+--- a/s3fs/src/S3fsService.php
++++ b/s3fs/src/S3fsService.php
+@@ -153,8 +153,14 @@ class S3fsService implements S3fsServiceInterface {
+           $provider = CredentialProvider::ini(NULL, $config['credentials_file']);
+         }
+         else {
+-          // Assume an instance profile provider if no path.
+-          $provider = CredentialProvider::instanceProfile();
++          if (!empty($config['use_ecs_credentials'])) {
++            // Running drupal with fargate/ecs credentials.
++            $provider = CredentialProvider::ecsCredentials();
++          }
++          else {
++            // Assume an instance profile provider if no path.
++            $provider = CredentialProvider::instanceProfile();
++          }
+         }
+         // Cache the results in a memoize function to avoid loading and parsing
+         // the ini file on every API operation.
