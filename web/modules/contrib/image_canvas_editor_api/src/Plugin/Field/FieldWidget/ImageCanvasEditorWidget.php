@@ -87,7 +87,7 @@ class ImageCanvasEditorWidget extends ImageWidget {
         $editor_label = $editors[$editor_setting]['label'];
       }
       else {
-        $editor_label = t('Broken/Missing.');
+        $editor_label = $this->t('Broken/Missing.');
       }
     }
     else {
@@ -95,7 +95,7 @@ class ImageCanvasEditorWidget extends ImageWidget {
       $editor = reset($editors);
       $editor_label = $editor['label'];
     }
-    $summary[] = t('Editor: @editor', [
+    $summary[] = $this->t('Editor: @editor', [
       '@editor' => $editor_label,
     ]);
     return $summary;
